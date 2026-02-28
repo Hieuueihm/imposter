@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Imposter Who</title>
+<style>
+body { font-family: Arial; text-align: center; margin-top: 30px; }
+button { padding: 10px 20px; margin: 10px; }
+.hidden { display: none; }
+.card { font-size: 22px; margin-top: 20px; white-space: pre-line; }
+input { margin: 5px; padding: 5px; }
+</style>
+</head>
+<body>
+
+<h2>Imposter Who - Offline</h2>
+
+<div id="setup">
+    <input type="number" id="players" placeholder="Số người chơi"><br>
+    <input type="number" id="imposters" placeholder="Số imposter"><br>
+    <button onclick="createNameInputs()">Tiếp tục</button>
+</div>
+
+<div id="nameInput" class="hidden"></div>
+
+<div id="game" class="hidden">
+    <h3 id="playerTurn"></h3>
+    <button onclick="showRole()">Xem vai trò</button>
+    <div id="roleDisplay" class="card hidden"></div>
+    <button onclick="nextPlayer()" class="hidden" id="nextBtn">Người tiếp theo</button>
+</div>
+
+<div id="announceStart" class="hidden">
+    <h2 id="startPlayerText"></h2>
+    <button onclick="goToEnd()">Bắt đầu thảo luận</button>
+</div>
+
+<div id="end" class="hidden">
+    <h2>Kết quả</h2>
+    <div id="result"></div>
+    <button onclick="startNewRound()">Chơi vòng mới</button>
+</div>
+
+<script>
+
+const wordList = [
+    { key: "Pizza", hint: "Món ăn Ý", field: "Food" },
+    { key: "Tesla", hint: "Xe điện", field: "Technology" },
+    { key: "Violin", hint: "Nhạc cụ dây", field: "Music" },
+    { key: "Shark", hint: "Sống dưới biển", field: "Animal" }
+];
+
+let players = [];
+let roles = [];
+let currentIndex = 0;
+let totalPlayers = 0;
+let totalImposters = 0;
+let selectedWord = null;
+let startPlayerIndex = 0;
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function createNameInputs() {
+    totalPlayers = parseInt(document.getElementById("players").value);
+    totalImposters = parseInt(document.getElementById("imposters").value);
+
+    if (!totalPlayers || !totalImposters || totalImposters >= totalPlayers) {
+        alert("Kiểm tra lại số người và số imposter!");
+        return;
+    }
+
+    document.getElementById("setup").classList.add("hidden");
+
+    let container = document.getElementById("nameInput");
+    container.innerHTML = "<h3>Nhập tên người chơi</h3>";
+
+    for (let i = 0; i < totalPlayers; i++) {
+        container.innerHTML +=
+            `<input type="text" id="player${i}" placeholder="Tên người ${i+1}"><br>`;
+    }
+
+    container.innerHTML += `<button onclick="startGame()">Bắt đầu game</button>`;
+    container.classList.remove("hidden");
+}
+
+function startGame() {
+    players = [];
+    for (let i = 0; i < totalPlayers; i++) {
+        let name = document.getElementById("player"+i).value;
+        if (!name) {
+            alert("Vui lòng nhập đủ tên!");
+            return;
+        }
+        players.push(name);
+    }
+
+    selectedWord = wordList[Math.floor(Math.random() * wordList.length)];
+
+    roles = [];
+    for (let i = 0; i < totalImposters; i++) roles.push("imposter");
+    for (let i = totalImposters; i < totalPlayers; i++) roles.push("normal");
+    roles = shuffle(roles);
+
+    currentIndex = 0;
+
+    document.getElementById("nameInput").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
+
+    document.getElementById("playerTurn").innerText =
+        players[currentIndex];
+}
+
+function showRole() {
+    let display = document.getElementById("roleDisplay");
+
+    if (roles[currentIndex] === "imposter") {
+        display.innerText =
+            players[currentIndex] +
+            "\n\nIMPOSTER\n\nHint: " +
+            selectedWord.hint +
+            "\nField: " + selectedWord.field;
+    } else {
+        display.innerText =
+            players[currentIndex] +
+            "\n\nNgười thường\n\nKey: " +
+            selectedWord.key +
+            "\nField: " + selectedWord.field;
+    }
+
+    display.classList.remove("hidden");
+    document.getElementById("nextBtn").classList.remove("hidden");
+}
+
+function nextPlayer() {
+    document.getElementById("roleDisplay").classList.add("hidden");
+    document.getElementById("nextBtn").classList.add("hidden");
+
+    currentIndex++;
+
+    if (currentIndex >= totalPlayers) {
+        chooseStartPlayer();
+        return;
+    }
+
+    document.getElementById("playerTurn").innerText =
+        players[currentIndex];
+}
+
+function chooseStartPlayer() {
+    startPlayerIndex = Math.floor(Math.random() * totalPlayers);
+
+    document.getElementById("game").classList.add("hidden");
+    document.getElementById("announceStart").classList.remove("hidden");
+
+    document.getElementById("startPlayerText").innerText =
+        players[startPlayerIndex] + " sẽ là người START!";
+}
+
+function goToEnd() {
+    document.getElementById("announceStart").classList.add("hidden");
+    document.getElementById("end").classList.remove("hidden");
+
+    let resultText = "<h3>Key: " + selectedWord.key + "</h3><br>";
+
+    for (let i = 0; i < totalPlayers; i++) {
+        if (roles[i] === "imposter") {
+            resultText += players[i] + " là IMPOSTER<br>";
+        }
+    }
+
+    document.getElementById("result").innerHTML = resultText;
+}
+
+function startNewRound() {
+    roles = [];
+    currentIndex = 0;
+    selectedWord = wordList[Math.floor(Math.random() * wordList.length)];
+
+    for (let i = 0; i < totalImposters; i++) roles.push("imposter");
+    for (let i = totalImposters; i < totalPlayers; i++) roles.push("normal");
+    roles = shuffle(roles);
+
+    document.getElementById("end").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
+    document.getElementById("playerTurn").innerText = players[currentIndex];
+}
+
+</script>
+
+</body>
+</html>
