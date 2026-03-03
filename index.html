@@ -23,6 +23,12 @@ input { margin: 5px; padding: 5px; }
 
 <div id="nameInput" class="hidden"></div>
 
+<div id="fieldSelect" class="hidden">
+    <h3>Chọn lĩnh vực (có thể chọn nhiều)</h3>
+    <div id="fieldCheckboxes"></div>
+    <button onclick="startGame()">Bắt đầu game</button>
+</div>
+
 <div id="game" class="hidden">
     <h3 id="playerTurn"></h3>
     <button onclick="showRole()">Xem vai trò</button>
@@ -42,12 +48,139 @@ input { margin: 5px; padding: 5px; }
 </div>
 
 <script>
-
 const wordList = [
-    { key: "Pizza", hint: "Món ăn Ý", field: "Food" },
-    { key: "Tesla", hint: "Xe điện", field: "Technology" },
-    { key: "Violin", hint: "Nhạc cụ dây", field: "Music" },
-    { key: "Shark", hint: "Sống dưới biển", field: "Animal" }
+
+    // ================= ĐỒ VẬT =================
+    { key: "Quạt máy", hint: "Chu kỳ", field: "Đồ vật" },
+    { key: "Nồi cơm điện", hint: "Tự động", field: "Đồ vật" },
+    { key: "Bình giữ nhiệt", hint: "Ổn định", field: "Đồ vật" },
+    { key: "Ổ điện", hint: "Trung gian", field: "Đồ vật" },
+    { key: "Cầu dao", hint: "Ngắt mạch", field: "Đồ vật" },
+    { key: "Bếp ga", hint: "Chuyển hóa", field: "Đồ vật" },
+    { key: "Bàn ủi", hint: "Làm phẳng", field: "Đồ vật" },
+    { key: "Máy giặt", hint: "Chu trình", field: "Đồ vật" },
+    { key: "Tủ lạnh", hint: "Bảo toàn", field: "Đồ vật" },
+    { key: "Chảo", hint: "Tiếp xúc", field: "Đồ vật" },
+    { key: "Dao", hint: "Phân tách", field: "Đồ vật" },
+    { key: "Muỗng", hint: "Chuyển tải", field: "Đồ vật" },
+    { key: "Đũa", hint: "Song song", field: "Đồ vật" },
+    { key: "Balo", hint: "Di động", field: "Đồ vật" },
+    { key: "Mũ bảo hiểm", hint: "Giảm thiểu", field: "Đồ vật" },
+    { key: "Xe máy", hint: "Tăng tốc", field: "Đồ vật" },
+    { key: "Remote", hint: "Khoảng cách", field: "Đồ vật" },
+    { key: "Tivi", hint: "Phát sóng", field: "Đồ vật" },
+    { key: "Đèn tuýp", hint: "Kích hoạt", field: "Đồ vật" },
+    { key: "Ổ khóa", hint: "Giới hạn", field: "Đồ vật" },
+    { key: "Chìa khóa", hint: "Mở rộng", field: "Đồ vật" },
+    { key: "Kéo", hint: "Tách đôi", field: "Đồ vật" },
+    { key: "Gương", hint: "Đối xứng", field: "Đồ vật" },
+    { key: "Thang", hint: "Chuyển tầng", field: "Đồ vật" },
+    { key: "Xô", hint: "Dung tích", field: "Đồ vật" },
+    { key: "Bình nước", hint: "Chứa đựng", field: "Đồ vật" },
+    { key: "Nón lá", hint: "Biểu tượng", field: "Đồ vật" },
+    { key: "Chiếu", hint: "Trải rộng", field: "Đồ vật" },
+    { key: "Đồng hồ", hint: "Chuẩn mực", field: "Đồ vật" },
+    { key: "Pin sạc", hint: "Tích lũy", field: "Đồ vật" },
+
+
+    // ================= ĐỒ ĂN =================
+    { key: "Phở", hint: "Tổng hợp", field: "Đồ ăn" },
+    { key: "Bún bò", hint: "Kết cấu", field: "Đồ ăn" },
+    { key: "Cơm tấm", hint: "Phân mảnh", field: "Đồ ăn" },
+    { key: "Bánh mì", hint: "Lớp vỏ", field: "Đồ ăn" },
+    { key: "Bánh xèo", hint: "Bao phủ", field: "Đồ ăn" },
+    { key: "Gỏi cuốn", hint: "Cuộn kín", field: "Đồ ăn" },
+    { key: "Chả giò", hint: "Bọc ngoài", field: "Đồ ăn" },
+    { key: "Hủ tiếu", hint: "Biến thể", field: "Đồ ăn" },
+    { key: "Lẩu", hint: "Chia sẻ", field: "Đồ ăn" },
+    { key: "Bánh chưng", hint: "Truyền thống", field: "Đồ ăn" },
+    { key: "Xôi", hint: "Kết dính", field: "Đồ ăn" },
+    { key: "Cháo", hint: "Giảm đặc", field: "Đồ ăn" },
+    { key: "Bánh cuốn", hint: "Mỏng nhẹ", field: "Đồ ăn" },
+    { key: "Nem chua", hint: "Lên men", field: "Đồ ăn" },
+    { key: "Đậu hũ", hint: "Chuyển trạng", field: "Đồ ăn" },
+    { key: "Cá kho", hint: "Cô đặc", field: "Đồ ăn" },
+    { key: "Thịt kho", hint: "Thấm dần", field: "Đồ ăn" },
+    { key: "Canh chua", hint: "Cân bằng", field: "Đồ ăn" },
+    { key: "Bánh bèo", hint: "Nhỏ gọn", field: "Đồ ăn" },
+    { key: "Bánh ít", hint: "Ẩn trong", field: "Đồ ăn" },
+    { key: "Mì gói", hint: "Tức thời", field: "Đồ ăn" },
+    { key: "Trà sữa", hint: "Pha trộn", field: "Đồ ăn" },
+    { key: "Cà phê", hint: "Kích thích", field: "Đồ ăn" },
+    { key: "Sinh tố", hint: "Xay nhuyễn", field: "Đồ ăn" },
+    { key: "Rau muống", hint: "Lan rộng", field: "Đồ ăn" },
+    { key: "Khoai lang", hint: "Giản dị", field: "Đồ ăn" },
+    { key: "Bắp luộc", hint: "Nguyên bản", field: "Đồ ăn" },
+    { key: "Trứng vịt lộn", hint: "Chuyển tiếp", field: "Đồ ăn" },
+    { key: "Bánh flan", hint: "Đông mềm", field: "Đồ ăn" },
+    { key: "Kem", hint: "Biến pha", field: "Đồ ăn" },
+
+
+    // ================= NGHỀ NGHIỆP =================
+    { key: "Giáo viên", hint: "Định hướng", field: "Nghề nghiệp" },
+    { key: "Bác sĩ", hint: "Can thiệp", field: "Nghề nghiệp" },
+    { key: "Công an", hint: "Kiểm soát", field: "Nghề nghiệp" },
+    { key: "Tài xế", hint: "Điều khiển", field: "Nghề nghiệp" },
+    { key: "Thợ xây", hint: "Hình thành", field: "Nghề nghiệp" },
+    { key: "Thợ điện", hint: "Truyền dẫn", field: "Nghề nghiệp" },
+    { key: "Đầu bếp", hint: "Chế biến", field: "Nghề nghiệp" },
+    { key: "Nhân viên bán hàng", hint: "Trao đổi", field: "Nghề nghiệp" },
+    { key: "Nhà báo", hint: "Phản ánh", field: "Nghề nghiệp" },
+    { key: "Luật sư", hint: "Biện hộ", field: "Nghề nghiệp" },
+    { key: "Nông dân", hint: "Chu kỳ", field: "Nghề nghiệp" },
+    { key: "Streamer", hint: "Tương tác", field: "Nghề nghiệp" },
+    { key: "Kỹ sư", hint: "Tối ưu", field: "Nghề nghiệp" },
+    { key: "Họa sĩ", hint: "Biểu đạt", field: "Nghề nghiệp" },
+    { key: "Ca sĩ", hint: "Cộng hưởng", field: "Nghề nghiệp" },
+    { key: "Diễn viên", hint: "Nhập vai", field: "Nghề nghiệp" },
+    { key: "Thợ sửa xe", hint: "Khôi phục", field: "Nghề nghiệp" },
+    { key: "MC", hint: "Dẫn dắt", field: "Nghề nghiệp" },
+    { key: "Y tá", hint: "Hỗ trợ", field: "Nghề nghiệp" },
+    { key: "Kiến trúc sư", hint: "Phác thảo", field: "Nghề nghiệp" },
+    { key: "Nhân viên ngân hàng", hint: "Quản lý", field: "Nghề nghiệp" },
+    { key: "Bảo vệ", hint: "Giám sát", field: "Nghề nghiệp" },
+    { key: "Thợ may", hint: "Liên kết", field: "Nghề nghiệp" },
+    { key: "Công nhân", hint: "Vận hành", field: "Nghề nghiệp" },
+    { key: "Nhà thiết kế", hint: "Ý tưởng", field: "Nghề nghiệp" },
+    { key: "Biên tập viên", hint: "Chỉnh sửa", field: "Nghề nghiệp" },
+    { key: "Phi công", hint: "Điều hướng", field: "Nghề nghiệp" },
+    { key: "Thợ cắt tóc", hint: "Thay đổi", field: "Nghề nghiệp" },
+    { key: "Nhà khoa học", hint: "Giả thuyết", field: "Nghề nghiệp" },
+    { key: "Lính cứu hỏa", hint: "Ứng cứu", field: "Nghề nghiệp" },
+
+
+    // ================= ĐỘNG VẬT =================
+    { key: "Chó", hint: "Gắn bó", field: "Động vật" },
+    { key: "Mèo", hint: "Độc lập", field: "Động vật" },
+    { key: "Gà", hint: "Chu kỳ", field: "Động vật" },
+    { key: "Vịt", hint: "Lưỡng môi", field: "Động vật" },
+    { key: "Trâu", hint: "Sức kéo", field: "Động vật" },
+    { key: "Bò", hint: "Chuyển hóa", field: "Động vật" },
+    { key: "Heo", hint: "Tăng trưởng", field: "Động vật" },
+    { key: "Cá", hint: "Môi trường", field: "Động vật" },
+    { key: "Tôm", hint: "Lột xác", field: "Động vật" },
+    { key: "Cua", hint: "Lệch hướng", field: "Động vật" },
+    { key: "Rắn", hint: "Biến đổi", field: "Động vật" },
+    { key: "Ếch", hint: "Chuyển pha", field: "Động vật" },
+    { key: "Dê", hint: "Leo dốc", field: "Động vật" },
+    { key: "Cừu", hint: "Bầy đàn", field: "Động vật" },
+    { key: "Chim sẻ", hint: "Phản xạ", field: "Động vật" },
+    { key: "Bướm", hint: "Chu trình", field: "Động vật" },
+    { key: "Kiến", hint: "Tổ chức", field: "Động vật" },
+    { key: "Ong", hint: "Cấu trúc", field: "Động vật" },
+    { key: "Cá chép", hint: "Biến cố", field: "Động vật" },
+    { key: "Mực", hint: "Phòng vệ", field: "Động vật" },
+    { key: "Cá rô", hint: "Sinh tồn", field: "Động vật" },
+    { key: "Chim bồ câu", hint: "Biểu trưng", field: "Động vật" },
+    { key: "Chim én", hint: "Thời điểm", field: "Động vật" },
+    { key: "Nhện", hint: "Kiến tạo", field: "Động vật" },
+    { key: "Chuột", hint: "Thích nghi", field: "Động vật" },
+    { key: "Dơi", hint: "Định vị", field: "Động vật" },
+    { key: "Sứa", hint: "Phi cấu trúc", field: "Động vật" },
+    { key: "Rùa", hint: "Bảo toàn", field: "Động vật" },
+    { key: "Cá lóc", hint: "Chịu đựng", field: "Động vật" },
+    { key: "Cá tra", hint: "Nuôi trồng", field: "Động vật" }
+
 ];
 
 let players = [];
@@ -56,8 +189,9 @@ let currentIndex = 0;
 let totalPlayers = 0;
 let totalImposters = 0;
 let selectedWord = null;
+let selectedFields = [];
 let startPlayerIndex = 0;
-
+let usedWords = [];
 function shuffle(array) {
     return array.sort(() => Math.random() - 0.5);
 }
@@ -81,12 +215,13 @@ function createNameInputs() {
             `<input type="text" id="player${i}" placeholder="Tên người ${i+1}"><br>`;
     }
 
-    container.innerHTML += `<button onclick="startGame()">Bắt đầu game</button>`;
+    container.innerHTML += `<button onclick="prepareFieldSelect()">Tiếp tục</button>`;
     container.classList.remove("hidden");
 }
 
-function startGame() {
+function prepareFieldSelect() {
     players = [];
+
     for (let i = 0; i < totalPlayers; i++) {
         let name = document.getElementById("player"+i).value;
         if (!name) {
@@ -96,7 +231,45 @@ function startGame() {
         players.push(name);
     }
 
-    selectedWord = wordList[Math.floor(Math.random() * wordList.length)];
+    document.getElementById("nameInput").classList.add("hidden");
+
+    let uniqueFields = [...new Set(wordList.map(w => w.field))];
+    let container = document.getElementById("fieldCheckboxes");
+    container.innerHTML = "";
+
+    uniqueFields.forEach(field => {
+        container.innerHTML += `
+            <label>
+                <input type="checkbox" value="${field}">
+                ${field}
+            </label><br>
+        `;
+    });
+
+    document.getElementById("fieldSelect").classList.remove("hidden");
+}
+
+function startGame() {
+
+    let checkedBoxes = document.querySelectorAll(
+        "#fieldCheckboxes input:checked"
+    );
+
+    if (checkedBoxes.length === 0) {
+        alert("Vui lòng chọn ít nhất 1 lĩnh vực!");
+        return;
+    }
+
+    selectedFields = [];
+    checkedBoxes.forEach(box => {
+        selectedFields.push(box.value);
+    });
+
+    let filteredWords = wordList.filter(w =>
+        selectedFields.includes(w.field)
+    );
+
+    selectedWord = getRandomWord(filteredWords);
 
     roles = [];
     for (let i = 0; i < totalImposters; i++) roles.push("imposter");
@@ -105,13 +278,32 @@ function startGame() {
 
     currentIndex = 0;
 
-    document.getElementById("nameInput").classList.add("hidden");
+    document.getElementById("fieldSelect").classList.add("hidden");
     document.getElementById("game").classList.remove("hidden");
 
     document.getElementById("playerTurn").innerText =
         players[currentIndex];
 }
+function getRandomWord(filteredWords) {
 
+    let availableWords = filteredWords.filter(w =>
+        !usedWords.includes(w.key)
+    );
+
+    // Nếu hết từ thì reset
+    if (availableWords.length === 0) {
+        usedWords = [];
+        availableWords = filteredWords;
+    }
+
+    let randomWord = availableWords[
+        Math.floor(Math.random() * availableWords.length)
+    ];
+
+    usedWords.push(randomWord.key);
+
+    return randomWord;
+}
 function showRole() {
     let display = document.getElementById("roleDisplay");
 
@@ -119,14 +311,12 @@ function showRole() {
         display.innerText =
             players[currentIndex] +
             "\n\nIMPOSTER\n\nHint: " +
-            selectedWord.hint +
-            "\nField: " + selectedWord.field;
+            selectedWord.hint;
     } else {
         display.innerText =
             players[currentIndex] +
             "\n\nNgười thường\n\nKey: " +
-            selectedWord.key +
-            "\nField: " + selectedWord.field;
+            selectedWord.key;
     }
 
     display.classList.remove("hidden");
@@ -174,13 +364,20 @@ function goToEnd() {
 }
 
 function startNewRound() {
-    roles = [];
-    currentIndex = 0;
-    selectedWord = wordList[Math.floor(Math.random() * wordList.length)];
 
+    let filteredWords = wordList.filter(w =>
+        selectedFields.includes(w.field)
+    );
+
+
+    selectedWord = getRandomWord(filteredWords);
+
+    roles = [];
     for (let i = 0; i < totalImposters; i++) roles.push("imposter");
     for (let i = totalImposters; i < totalPlayers; i++) roles.push("normal");
     roles = shuffle(roles);
+
+    currentIndex = 0;
 
     document.getElementById("end").classList.add("hidden");
     document.getElementById("game").classList.remove("hidden");
